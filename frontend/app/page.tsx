@@ -107,11 +107,11 @@ const menuSections = [
 ];
 
 const quickActions = [
-  { label: "Crear servicio programado", href: "#" },
-  { label: "Alta de cliente", href: "/customers" },
-  { label: "Registrar repuesto usado", href: "#" },
-  { label: "Lanzar proyecto", href: "#" },
-  { label: "Configurar permisos", href: "#" },
+  { label: "Crear servicio programado", href: "/sistema/servicios" },
+  { label: "Alta de cliente", href: "/directorio/clientes" },
+  { label: "Registrar repuesto usado", href: "/sistema/inventario" },
+  { label: "Lanzar proyecto", href: "/sistema/proyectos" },
+  { label: "Configurar permisos", href: "/configuracion/perfiles" },
 ];
 
 const highlights = [
