@@ -107,11 +107,11 @@ const menuSections = [
 ];
 
 const quickActions = [
-  "Crear servicio programado",
-  "Alta de cliente",
-  "Registrar repuesto usado",
-  "Lanzar proyecto",
-  "Configurar permisos",
+  { label: "Crear servicio programado", href: "#" },
+  { label: "Alta de cliente", href: "/customers" },
+  { label: "Registrar repuesto usado", href: "#" },
+  { label: "Lanzar proyecto", href: "#" },
+  { label: "Configurar permisos", href: "#" },
 ];
 
 const highlights = [
@@ -137,12 +137,13 @@ export default function Home() {
           </div>
           <div className="flex flex-wrap gap-3">
             {quickActions.map((action) => (
-              <button
-                key={action}
+              <a
+                key={action.label}
+                href={action.href}
                 className="glass rounded-full px-4 py-2 text-sm text-white hover:border-emerald-300/60 hover:shadow-[0_0_0_1px_rgba(142,243,197,0.35)] transition"
               >
-                {action}
-              </button>
+                {action.label}
+              </a>
             ))}
           </div>
           <div className="flex flex-wrap gap-6 text-sm text-slate-300">
