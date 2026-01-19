@@ -1,0 +1,176 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ServiceStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  DONE
+  CANCELLED
+}
+
+enum InventoryStatus {
+  AVAILABLE
+  RESERVED
+  IN_USE
+  RETIRED
+}
+
+model Tenant {
+  id             String            @id @default(uuid())
+  name           String
+  code           String            @unique
+  users          User[]
+  roles          Role[]
+  customers      Customer[]
+  projects       Project[]
+  inventory      InventoryItem[]
+  serviceOrders  ServiceOrder[]
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+}
+
+model Role {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  permissions Json?
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  tenantId    String
+  users       User[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String?
+  firstName String
+  lastName  String
+  phone     String?
+  active    Boolean  @default(true)
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  tenantId  String
+  role      Role?    @relation(fields: [roleId], references: [id])
+  roleId    String?
+  tasks     Task[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Customer {
+  id            String         @id @default(uuid())
+  legalName     String
+  tradeName     String?
+  taxId         String?
+  email         String?
+  phone         String?
+  type          String?
+  notes         String?
+  tenant        Tenant         @relation(fields: [tenantId], references: [id])
+  tenantId      String
+  contacts      Contact[]
+  serviceOrders ServiceOrder[]
+  projects      Project[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Contact {
+  id         String   @id @default(uuid())
+  firstName  String
+  lastName   String
+  email      String?
+  phone      String?
+  role       String?
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model InventoryItem {
+  id             String                @id @default(uuid())
+  name           String
+  sku            String                @unique
+  serialNumber   String?
+  quantity       Int                   @default(0)
+  unit           String?
+  status         InventoryStatus       @default(AVAILABLE)
+  location       String?
+  tenant         Tenant                @relation(fields: [tenantId], references: [id])
+  tenantId       String
+  serviceUsages  ServiceOrderInventory[]
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+}
+
+model ServiceOrder {
+  id              String                 @id @default(uuid())
+  title           String
+  description     String?
+  status          ServiceStatus          @default(PLANNED)
+  scheduledAt     DateTime?
+  completedAt     DateTime?
+  tenant          Tenant                 @relation(fields: [tenantId], references: [id])
+  tenantId        String
+  customer        Customer?              @relation(fields: [customerId], references: [id])
+  customerId      String?
+  tasks           Task[]
+  inventoryUsage  ServiceOrderInventory[]
+  project         Project?               @relation(fields: [projectId], references: [id])
+  projectId       String?
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+}
+
+model Task {
+  id             String       @id @default(uuid())
+  title          String
+  description    String?
+  status         TaskStatus   @default(PENDING)
+  dueDate        DateTime?
+  serviceOrder   ServiceOrder @relation(fields: [serviceOrderId], references: [id])
+  serviceOrderId String
+  assignee       User?        @relation(fields: [assigneeId], references: [id])
+  assigneeId     String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model Project {
+  id            String         @id @default(uuid())
+  name          String
+  description   String?
+  status        String?
+  tenant        Tenant         @relation(fields: [tenantId], references: [id])
+  tenantId      String
+  serviceOrders ServiceOrder[]
+  customers     Customer[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model ServiceOrderInventory {
+  id              String        @id @default(uuid())
+  quantity        Int           @default(1)
+  serviceOrder    ServiceOrder  @relation(fields: [serviceOrderId], references: [id])
+  serviceOrderId  String
+  inventoryItem   InventoryItem @relation(fields: [inventoryItemId], references: [id])
+  inventoryItemId String
+
+  @@unique([serviceOrderId, inventoryItemId])
+}

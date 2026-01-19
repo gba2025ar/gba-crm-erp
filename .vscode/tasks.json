@@ -1,0 +1,37 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "backend: dev",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "start:dev"],
+      "options": {
+        "cwd": "${workspaceFolder}/backend"
+      },
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "frontend: dev",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "dev"],
+      "options": {
+        "cwd": "${workspaceFolder}/frontend"
+      },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "db: up",
+      "type": "shell",
+      "command": "docker",
+      "args": ["compose", "up", "-d", "db"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    }
+  ]
+}
